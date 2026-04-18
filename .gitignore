@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+.Python
+build/
+dist/
+
+# Bridge local config — never commit real user config
+bridge/config.json
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS crumbs
+.DS_Store
+Thumbs.db
+
+# Arduino build artefacts (Arduino IDE 2.x places these alongside the .ino)
+arduino/claude_controller/build/
+*.hex
+*.elf
+*.bin
+
+# Settings backups produced by the installer
+*.bak.*
+
+# Logs
+*.log

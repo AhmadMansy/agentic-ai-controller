@@ -1,0 +1,18 @@
+{
+  "_comment": "Copy to config.json and edit. All fields are optional — unset fields fall back to defaults.",
+
+  "port": null,
+  "baud": 9600,
+
+  "http_host": "127.0.0.1",
+  "http_port": 8787,
+
+  "reconnect_delay_s": 2.0,
+  "boot_test": true,
+
+  "keys": {
+    "approve": "enter",
+    "up": "up",
+    "down": "down"
+  }
+}

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- launchd template for claude-controller bridge (macOS).
+     install.sh substitutes {{PYTHON_BIN}}, {{BRIDGE_SCRIPT}}, {{HTTP_PORT}},
+     and {{LOG_DIR}} before loading this into launchctl. -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.claudecontroller.bridge</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{PYTHON_BIN}}</string>
+        <string>{{BRIDGE_SCRIPT}}</string>
+        <string>--http-port</string>
+        <string>{{HTTP_PORT}}</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+
+    <key>ThrottleInterval</key>
+    <integer>5</integer>
+
+    <key>StandardOutPath</key>
+    <string>{{LOG_DIR}}/bridge.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>{{LOG_DIR}}/bridge.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>

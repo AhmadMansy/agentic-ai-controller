@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "Read(//Users/ahmedmansy/.claude/**)",
+      "Bash(sh -c 'curl -s --max-time 1 http://127.0.0.1:8787/led/red > /dev/null 2>&1 || true')",
+      "Bash(echo \"hook-cmd exit: $?\")",
+      "Bash(afplay /Users/ahmedmansy/.claude/sounds/mawlay.ogg -v 0.2)",
+      "Bash(echo \"afplay-ok: $?\")",
+      "Bash(python3 hooks_merge.py --dry-run)"
+    ]
+  }
+}

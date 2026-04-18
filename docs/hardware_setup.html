@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Claude Controller — Hardware Setup</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #161a22;
+    --panel-2: #1d2230;
+    --border: #2a3142;
+    --text: #e6e9ef;
+    --muted: #8a93a6;
+    --accent: #8ab4ff;
+    --red: #ff5e5e;
+    --yellow: #ffd34d;
+    --green: #56d98a;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #fafafa; --panel: #fff; --panel-2: #f2f4f8;
+      --border: #dfe3ea; --text: #1a1d24; --muted: #5b6476; --accent: #2563eb;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+    padding: 32px 20px 80px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  header { margin-bottom: 28px; }
+  header h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.02em; }
+  header p  { margin: 0; color: var(--muted); }
+  .lights {
+    display: inline-flex; gap: 8px; margin-left: 10px; vertical-align: middle;
+  }
+  .dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.08) inset, 0 0 10px currentColor;
+  }
+  .dot.r { background: var(--red);    color: var(--red); }
+  .dot.y { background: var(--yellow); color: var(--yellow); }
+  .dot.g { background: var(--green);  color: var(--green); }
+
+  nav.toc {
+    display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 14px;
+    border: 1px solid var(--border); background: var(--panel-2);
+    border-radius: 10px; margin-bottom: 28px;
+    font-size: 13px;
+  }
+  nav.toc a {
+    color: var(--accent); text-decoration: none; padding: 2px 8px;
+    border-radius: 999px; border: 1px solid transparent;
+  }
+  nav.toc a:hover { border-color: var(--border); background: var(--panel); }
+
+  section {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 24px; margin-bottom: 22px;
+  }
+  section h2 {
+    margin: 0 0 14px; font-size: 20px; letter-spacing: -0.01em;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  section h2 .num {
+    font: 600 12px/1 var(--mono); color: var(--muted);
+    border: 1px solid var(--border); padding: 4px 7px; border-radius: 6px;
+  }
+  section h3 { margin: 18px 0 8px; font-size: 15px; }
+  p  { margin: 0 0 10px; }
+  ul, ol { margin: 0 0 10px; padding-left: 20px; }
+  li { margin: 4px 0; }
+
+  code, kbd {
+    font-family: var(--mono); font-size: 0.92em;
+    background: var(--panel-2); padding: 1px 6px; border-radius: 5px;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--panel-2); border: 1px solid var(--border);
+    padding: 12px 14px; border-radius: 8px; overflow-x: auto;
+    font-family: var(--mono); font-size: 13px; line-height: 1.5;
+  }
+
+  table {
+    width: 100%; border-collapse: collapse; margin: 6px 0 12px;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left; padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  th { font-weight: 600; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td.mono { font-family: var(--mono); }
+  tr td:first-child { white-space: nowrap; }
+
+  .pin { display: inline-block; font-family: var(--mono); font-size: 12px;
+         padding: 2px 7px; border-radius: 4px; border: 1px solid var(--border);
+         background: var(--panel-2); }
+  .pin.power { color: #ff8a8a; border-color: rgba(255,100,100,0.4); }
+  .pin.gnd   { color: var(--muted); }
+  .pin.dig   { color: var(--accent); border-color: rgba(138,180,255,0.4); }
+  .pin.ana   { color: #b598ff; border-color: rgba(181,152,255,0.4); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .card {
+    padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--panel-2);
+  }
+  .card h4 { margin: 0 0 6px; font-size: 14px; }
+  .card p  { margin: 0; color: var(--muted); font-size: 13.5px; }
+
+  .callout {
+    padding: 12px 14px; border-radius: 8px; margin: 12px 0;
+    border-left: 3px solid var(--accent);
+    background: rgba(138,180,255,0.07);
+    font-size: 14px;
+  }
+  .callout.warn { border-left-color: var(--yellow); background: rgba(255,211,77,0.08); }
+  .callout.ok   { border-left-color: var(--green);  background: rgba(86,217,138,0.08); }
+  .callout strong { color: var(--text); }
+
+  /* Diagram wrapper */
+  .diagram-wrap {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; overflow-x: auto;
+  }
+  svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px;
+    color: var(--muted); margin-top: 10px;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i {
+    width: 14px; height: 3px; border-radius: 2px; display: inline-block;
+  }
+
+  footer {
+    margin-top: 32px; text-align: center;
+    color: var(--muted); font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Claude Controller
+    <span class="lights"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></span>
+  </h1>
+  <p>Physical status lights + approve button for Claude Code. Everything you need to wire, upload, and run.</p>
+</header>
+
+<nav class="toc">
+  <a href="#overview">Overview</a>
+  <a href="#parts">Parts</a>
+  <a href="#pinout">Pinout</a>
+  <a href="#diagram">Wiring diagram</a>
+  <a href="#assembly">Assembly</a>
+  <a href="#upload">Upload sketch</a>
+  <a href="#bridge">Run bridge</a>
+  <a href="#accessibility">macOS access</a>
+  <a href="#test">Test it</a>
+  <a href="#troubleshoot">Troubleshooting</a>
+</nav>
+
+<!-- 1. Overview -->
+<section id="overview">
+  <h2><span class="num">01</span>What you're building</h2>
+  <p>Three LEDs mirror Claude Code's state. A button and joystick let you approve permission prompts without touching the keyboard.</p>
+  <div class="grid-2">
+    <div class="card">
+      <h4><span class="dot r" style="display:inline-block;vertical-align:middle;margin-right:6px"></span>Red — busy</h4>
+      <p>Lights when you submit a prompt. Claude is thinking / running tools.</p>
+    </div>
+    <div class="card">
+      <h4><span class="dot y" style="display:inline-block;vertical-align:middle;margin-right:6px"></span>Yellow — permission</h4>
+      <p>Claude is blocked waiting for you to approve a tool call.</p>
+    </div>
+    <div class="card">
+      <h4><span class="dot g" style="display:inline-block;vertical-align:middle;margin-right:6px"></span>Green — ready</h4>
+      <p>Turn is finished. Safe to walk away or fire off the next prompt.</p>
+    </div>
+    <div class="card">
+      <h4>Joystick + big button</h4>
+      <p>Joystick up/down moves the selector in a permission dialog. Button = Enter = approve.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Parts -->
+<section id="parts">
+  <h2><span class="num">02</span>Parts list</h2>
+  <table>
+    <thead><tr><th>Qty</th><th>Part</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Arduino Uno (R3 or R4)</td><td>Connected over USB.</td></tr>
+      <tr><td>1</td><td>Red 5mm LED</td><td>Busy indicator.</td></tr>
+      <tr><td>1</td><td>Yellow 5mm LED</td><td>Permission indicator.</td></tr>
+      <tr><td>1</td><td>Green 5mm LED</td><td>Ready indicator.</td></tr>
+      <tr><td>3</td><td>220&nbsp;Ω resistors</td><td>One per LED. Color bands: red-red-brown.</td></tr>
+      <tr><td>1</td><td>Momentary push button</td><td>The big "approve" button.</td></tr>
+      <tr><td>1</td><td>2-axis joystick module</td><td>Typical KY-023 with VCC / GND / VRx / VRy / SW pins.</td></tr>
+      <tr><td>1</td><td>Breadboard (half size or larger)</td><td>Solderless.</td></tr>
+      <tr><td>~12</td><td>Jumper wires</td><td>Male-to-male for breadboard; male-to-female if the joystick has pin headers.</td></tr>
+      <tr><td>1</td><td>USB cable</td><td>Whatever plugs the Uno into your Mac.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <strong>LED polarity:</strong> the long leg is the <em>anode</em> (+), the short leg is the <em>cathode</em> (−, flat side of the plastic rim). The anode goes to the Arduino pin <em>through a 220 Ω resistor</em>. The cathode goes to GND.
+  </div>
+</section>
+
+<!-- 3. Pinout -->
+<section id="pinout">
+  <h2><span class="num">03</span>Pinout reference</h2>
+  <p>Every wire you'll place. This is the source of truth — the diagram and assembly steps below just visualize it.</p>
+  <table>
+    <thead><tr><th>Arduino pin</th><th>Connects to</th><th>Function</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pin dig">D9</span></td>  <td>Red LED anode → 220 Ω → red LED cathode → GND rail</td> <td>BUSY lamp</td></tr>
+      <tr><td><span class="pin dig">D10</span></td> <td>Yellow LED anode → 220 Ω → yellow LED cathode → GND rail</td> <td>PERMISSION lamp</td></tr>
+      <tr><td><span class="pin dig">D11</span></td> <td>Green LED anode → 220 Ω → green LED cathode → GND rail</td> <td>READY lamp</td></tr>
+      <tr><td><span class="pin dig">D2</span></td>  <td>One side of the push button. Other side → GND rail.</td> <td>Approve button (active-low, uses internal pull-up)</td></tr>
+      <tr><td><span class="pin dig">D3</span></td>  <td>Joystick <code>SW</code> pin</td> <td>Joystick press = second approve</td></tr>
+      <tr><td><span class="pin ana">A0</span></td>  <td>Joystick <code>VRy</code> pin (Y-axis)</td> <td>Up / down navigation</td></tr>
+      <tr><td><span class="pin power">5V</span></td> <td>Joystick <code>VCC</code> → 5V rail on the breadboard</td> <td>Power for the joystick</td></tr>
+      <tr><td><span class="pin gnd">GND</span></td>  <td>GND rail — joystick GND, both LED cathodes (via resistors), button's other leg</td> <td>Common ground</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn">
+    <strong>Joystick <code>VRx</code> is unused.</strong> You can leave it disconnected. Only the Y-axis drives up/down selection.
+  </div>
+</section>
+
+<!-- 4. Diagram -->
+<section id="diagram">
+  <h2><span class="num">04</span>Wiring diagram</h2>
+  <p>Schematic view — not a breadboard photo, but every connection is shown exactly once. Wire colors follow convention: <span style="color:#ff8a8a">red = 5V</span>, <span style="color:#8a93a6">black = GND</span>, colored = signal.</p>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 880 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Wiring diagram">
+      <!-- Arduino board -->
+      <rect x="40" y="120" width="260" height="340" rx="14" ry="14"
+            fill="#22304a" stroke="#3b4a66" stroke-width="2"/>
+      <text x="170" y="150" text-anchor="middle" fill="#cfd8ee" font-family="ui-monospace,monospace" font-size="15" font-weight="700">ARDUINO UNO</text>
+      <rect x="15" y="150" width="32" height="50" fill="#1a2438" stroke="#3b4a66"/>
+      <text x="31" y="180" text-anchor="middle" fill="#8a93a6" font-size="10" font-family="ui-monospace,monospace">USB</text>
+
+      <!-- Arduino pin stubs (right edge, spaced) -->
+      <g font-family="ui-monospace,monospace" font-size="12" fill="#e6e9ef">
+        <!-- helper: circle + label -->
+        <!-- 5V -->
+        <circle cx="300" cy="180" r="5" fill="#ff5e5e"/>
+        <text x="285" y="184" text-anchor="end">5V</text>
+        <!-- GND -->
+        <circle cx="300" cy="210" r="5" fill="#8a93a6"/>
+        <text x="285" y="214" text-anchor="end">GND</text>
+        <!-- D2 -->
+        <circle cx="300" cy="250" r="5" fill="#8ab4ff"/>
+        <text x="285" y="254" text-anchor="end">D2</text>
+        <!-- D3 -->
+        <circle cx="300" cy="280" r="5" fill="#8ab4ff"/>
+        <text x="285" y="284" text-anchor="end">D3</text>
+        <!-- D9 -->
+        <circle cx="300" cy="320" r="5" fill="#8ab4ff"/>
+        <text x="285" y="324" text-anchor="end">D9</text>
+        <!-- D10 -->
+        <circle cx="300" cy="350" r="5" fill="#8ab4ff"/>
+        <text x="285" y="354" text-anchor="end">D10</text>
+        <!-- D11 -->
+        <circle cx="300" cy="380" r="5" fill="#8ab4ff"/>
+        <text x="285" y="384" text-anchor="end">D11</text>
+        <!-- A0 -->
+        <circle cx="300" cy="420" r="5" fill="#b598ff"/>
+        <text x="285" y="424" text-anchor="end">A0</text>
+      </g>
+
+      <!-- Component: Red LED + resistor -->
+      <g>
+        <line x1="300" y1="320" x2="430" y2="320" stroke="#ff5e5e" stroke-width="2"/>
+        <rect x="430" y="310" width="60" height="20" rx="4" fill="#1d2230" stroke="#a59060"/>
+        <text x="460" y="325" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#c7b884">220 Ω</text>
+        <circle cx="520" cy="320" r="14" fill="#ff5e5e" stroke="#7a1a1a" stroke-width="2"/>
+        <text x="520" y="324" text-anchor="middle" font-size="10" fill="#1a0000" font-weight="700">LED</text>
+        <line x1="534" y1="320" x2="610" y2="320" stroke="#8a93a6" stroke-width="2"/>
+        <text x="560" y="312" text-anchor="middle" font-size="10" fill="#8a93a6" font-family="ui-monospace,monospace">to GND rail</text>
+        <text x="540" y="340" font-size="10" fill="#e6e9ef">RED — busy</text>
+      </g>
+
+      <!-- Component: Yellow LED + resistor -->
+      <g>
+        <line x1="300" y1="350" x2="430" y2="350" stroke="#ffd34d" stroke-width="2"/>
+        <rect x="430" y="340" width="60" height="20" rx="4" fill="#1d2230" stroke="#a59060"/>
+        <text x="460" y="355" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#c7b884">220 Ω</text>
+        <circle cx="520" cy="350" r="14" fill="#ffd34d" stroke="#7a5a10" stroke-width="2"/>
+        <text x="520" y="354" text-anchor="middle" font-size="10" fill="#3b2a00" font-weight="700">LED</text>
+        <line x1="534" y1="350" x2="610" y2="350" stroke="#8a93a6" stroke-width="2"/>
+        <text x="540" y="370" font-size="10" fill="#e6e9ef">YELLOW — permission</text>
+      </g>
+
+      <!-- Component: Green LED + resistor -->
+      <g>
+        <line x1="300" y1="380" x2="430" y2="380" stroke="#56d98a" stroke-width="2"/>
+        <rect x="430" y="370" width="60" height="20" rx="4" fill="#1d2230" stroke="#a59060"/>
+        <text x="460" y="385" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#c7b884">220 Ω</text>
+        <circle cx="520" cy="380" r="14" fill="#56d98a" stroke="#194d2b" stroke-width="2"/>
+        <text x="520" y="384" text-anchor="middle" font-size="10" fill="#012" font-weight="700">LED</text>
+        <line x1="534" y1="380" x2="610" y2="380" stroke="#8a93a6" stroke-width="2"/>
+        <text x="540" y="400" font-size="10" fill="#e6e9ef">GREEN — ready</text>
+      </g>
+
+      <!-- GND rail (right side) -->
+      <line x1="610" y1="300" x2="610" y2="440" stroke="#8a93a6" stroke-width="3"/>
+      <text x="618" y="440" font-size="11" fill="#8a93a6" font-family="ui-monospace,monospace">GND rail</text>
+
+      <!-- GND rail connection back to Arduino -->
+      <line x1="300" y1="210" x2="350" y2="210" stroke="#8a93a6" stroke-width="2"/>
+      <line x1="350" y1="210" x2="350" y2="460" stroke="#8a93a6" stroke-width="2"/>
+      <line x1="350" y1="460" x2="610" y2="460" stroke="#8a93a6" stroke-width="2"/>
+      <line x1="610" y1="460" x2="610" y2="440" stroke="#8a93a6" stroke-width="2"/>
+
+      <!-- Button -->
+      <g>
+        <line x1="300" y1="250" x2="430" y2="250" stroke="#8ab4ff" stroke-width="2"/>
+        <rect x="430" y="232" width="80" height="36" rx="6" fill="#1d2230" stroke="#4a5470"/>
+        <text x="470" y="254" text-anchor="middle" font-size="11" fill="#e6e9ef">APPROVE</text>
+        <line x1="510" y1="250" x2="560" y2="250" stroke="#8a93a6" stroke-width="2"/>
+        <line x1="560" y1="250" x2="560" y2="300" stroke="#8a93a6" stroke-width="2"/>
+        <line x1="560" y1="300" x2="610" y2="300" stroke="#8a93a6" stroke-width="2"/>
+        <text x="430" y="222" font-size="10" fill="#8a93a6">D2 → button → GND</text>
+      </g>
+
+      <!-- Joystick -->
+      <g>
+        <rect x="680" y="180" width="170" height="160" rx="10" fill="#1d2230" stroke="#4a5470"/>
+        <text x="765" y="202" text-anchor="middle" font-size="13" fill="#cfd8ee" font-weight="700">JOYSTICK</text>
+
+        <!-- Pads -->
+        <g font-family="ui-monospace,monospace" font-size="11">
+          <circle cx="700" cy="225" r="4" fill="#ff5e5e"/><text x="710" y="229" fill="#e6e9ef">VCC</text>
+          <circle cx="700" cy="250" r="4" fill="#8a93a6"/><text x="710" y="254" fill="#e6e9ef">GND</text>
+          <circle cx="700" cy="275" r="4" fill="#6b7285"/><text x="710" y="279" fill="#8a93a6">VRx  (unused)</text>
+          <circle cx="700" cy="300" r="4" fill="#b598ff"/><text x="710" y="304" fill="#e6e9ef">VRy  → A0</text>
+          <circle cx="700" cy="325" r="4" fill="#8ab4ff"/><text x="710" y="329" fill="#e6e9ef">SW   → D3</text>
+        </g>
+
+        <!-- Joystick stick indicator -->
+        <circle cx="830" cy="260" r="18" fill="#2a3142" stroke="#4a5470" stroke-width="2"/>
+        <circle cx="830" cy="260" r="5" fill="#8ab4ff"/>
+        <path d="M 830 238 v -8 M 830 290 v 8" stroke="#8a93a6" stroke-width="1.5"/>
+        <text x="830" y="225" text-anchor="middle" font-size="10" fill="#8a93a6">up</text>
+        <text x="830" y="310" text-anchor="middle" font-size="10" fill="#8a93a6">down</text>
+      </g>
+
+      <!-- Joystick wiring back to Arduino -->
+      <!-- VCC (red) -->
+      <line x1="700" y1="225" x2="670" y2="225" stroke="#ff5e5e" stroke-width="2"/>
+      <line x1="670" y1="225" x2="670" y2="180" stroke="#ff5e5e" stroke-width="2"/>
+      <line x1="670" y1="180" x2="300" y2="180" stroke="#ff5e5e" stroke-width="2"/>
+
+      <!-- GND (black) -->
+      <line x1="700" y1="250" x2="660" y2="250" stroke="#8a93a6" stroke-width="2"/>
+      <line x1="660" y1="250" x2="660" y2="500" stroke="#8a93a6" stroke-width="2"/>
+      <line x1="660" y1="500" x2="340" y2="500" stroke="#8a93a6" stroke-width="2"/>
+      <line x1="340" y1="500" x2="340" y2="210" stroke="#8a93a6" stroke-width="2" stroke-dasharray="3,3" opacity="0.6"/>
+      <text x="500" y="515" font-size="10" fill="#8a93a6" font-family="ui-monospace,monospace">(all GNDs tie together)</text>
+
+      <!-- VRy (purple) to A0 -->
+      <line x1="700" y1="300" x2="650" y2="300" stroke="#b598ff" stroke-width="2"/>
+      <line x1="650" y1="300" x2="650" y2="420" stroke="#b598ff" stroke-width="2"/>
+      <line x1="650" y1="420" x2="300" y2="420" stroke="#b598ff" stroke-width="2"/>
+
+      <!-- SW (blue) to D3 -->
+      <line x1="700" y1="325" x2="640" y2="325" stroke="#8ab4ff" stroke-width="2"/>
+      <line x1="640" y1="325" x2="640" y2="280" stroke="#8ab4ff" stroke-width="2"/>
+      <line x1="640" y1="280" x2="300" y2="280" stroke="#8ab4ff" stroke-width="2"/>
+
+      <!-- Title / labels at top -->
+      <text x="440" y="60" text-anchor="middle" font-size="14" fill="#8a93a6" font-family="ui-monospace,monospace">claude_controller — wiring</text>
+
+    </svg>
+    <div class="legend">
+      <span><i style="background:#ff5e5e"></i> 5V</span>
+      <span><i style="background:#8a93a6"></i> GND</span>
+      <span><i style="background:#8ab4ff"></i> digital signal</span>
+      <span><i style="background:#b598ff"></i> analog signal</span>
+      <span><i style="background:#ffd34d"></i> LED (yellow)</span>
+      <span><i style="background:#56d98a"></i> LED (green)</span>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Assembly -->
+<section id="assembly">
+  <h2><span class="num">05</span>Assembly (breadboard order)</h2>
+  <p>Do these in order. Keep the Arduino <strong>unplugged from USB</strong> until the very end.</p>
+
+  <h3>Power rails</h3>
+  <ol>
+    <li>Run a jumper from the Arduino's <span class="pin power">5V</span> pin to the red (+) rail on the breadboard.</li>
+    <li>Run a jumper from the Arduino's <span class="pin gnd">GND</span> pin to the blue/black (−) rail on the breadboard. This becomes the <em>GND rail</em> everything else shares.</li>
+  </ol>
+
+  <h3>LEDs (× 3)</h3>
+  <p>Each LED uses the same pattern — just change the digital pin per color.</p>
+  <ol>
+    <li>Put the LED across the breadboard gap. <strong>Long leg (+)</strong> on the Arduino side, short leg on the GND-rail side.</li>
+    <li>Plug one end of a 220 Ω resistor into the same row as the long leg; the other end into a free column further right.</li>
+    <li>Run a jumper from that free column to the Arduino pin:
+      <ul>
+        <li><span class="dot r" style="display:inline-block;width:10px;height:10px;vertical-align:middle"></span> red LED → <span class="pin dig">D9</span></li>
+        <li><span class="dot y" style="display:inline-block;width:10px;height:10px;vertical-align:middle"></span> yellow LED → <span class="pin dig">D10</span></li>
+        <li><span class="dot g" style="display:inline-block;width:10px;height:10px;vertical-align:middle"></span> green LED → <span class="pin dig">D11</span></li>
+      </ul>
+    </li>
+    <li>Run a jumper from the LED's short leg row to the GND rail.</li>
+  </ol>
+  <div class="callout warn">
+    <strong>Resistor placement matters — polarity doesn't (for the resistor).</strong> It goes between the Arduino pin and the LED anode, <em>not</em> on the GND side. Either direction of the resistor itself is fine.
+  </div>
+
+  <h3>Approve button</h3>
+  <ol>
+    <li>Seat the push button across the breadboard center gap so its 4 legs land on both sides.</li>
+    <li>From one leg, run a jumper to <span class="pin dig">D2</span>.</li>
+    <li>From the opposing-side leg, run a jumper to the GND rail.</li>
+  </ol>
+  <div class="callout">
+    <strong>No resistor needed for the button.</strong> The Arduino sketch enables the internal pull-up on D2, so the pin sits HIGH until the button pulls it LOW through GND.
+  </div>
+
+  <h3>Joystick</h3>
+  <ol>
+    <li><span class="pin power">5V</span> rail → joystick <code>VCC</code></li>
+    <li>GND rail → joystick <code>GND</code></li>
+    <li><span class="pin ana">A0</span> → joystick <code>VRy</code></li>
+    <li><span class="pin dig">D3</span> → joystick <code>SW</code></li>
+    <li>Leave <code>VRx</code> disconnected.</li>
+  </ol>
+
+  <h3>Final check before USB</h3>
+  <ul>
+    <li>Every LED's <strong>short leg</strong> reaches GND (not the long leg).</li>
+    <li>No bare wire is shorting 5V directly to GND on the rails.</li>
+    <li>The joystick <code>VCC</code> is on <strong>5V</strong>, not 3.3V.</li>
+  </ul>
+</section>
+
+<!-- 6. Upload -->
+<section id="upload">
+  <h2><span class="num">06</span>Upload the sketch</h2>
+  <ol>
+    <li>Plug the Arduino into your Mac with the USB cable.</li>
+    <li>Open the Arduino IDE, then <kbd>File</kbd> → <kbd>Open…</kbd> and choose
+      <br><code>~/Desktop/claude controler/arduino/claude_controller/claude_controller.ino</code>
+    </li>
+    <li>Set <kbd>Tools</kbd> → <kbd>Board</kbd> → <em>Arduino Uno</em>.</li>
+    <li>Set <kbd>Tools</kbd> → <kbd>Port</kbd> → <code>/dev/cu.usbmodem1101</code> (the number may vary; pick the <code>usbmodem</code> one).</li>
+    <li>Click the <strong>Upload</strong> arrow (→) in the toolbar. Wait for <em>"Done uploading"</em> at the bottom.</li>
+  </ol>
+  <div class="callout ok">
+    <strong>Expected:</strong> the moment upload finishes, all three LEDs flash briefly in sequence (red → yellow → green), then the <strong>green</strong> LED stays on. That's the boot self-test — it confirms wiring and sketch both work.
+  </div>
+</section>
+
+<!-- 7. Run bridge -->
+<section id="bridge">
+  <h2><span class="num">07</span>Install &amp; run the Python bridge</h2>
+  <p>The bridge owns the serial port, serves a tiny HTTP API for Claude's hooks, and turns the physical button/joystick into Enter/↑/↓ keystrokes.</p>
+  <pre>cd "~/Desktop/claude controler/bridge"
+pip3 install -r requirements.txt
+python3 claude_bridge.py</pre>
+  <p>On startup you should see:</p>
+  <pre>[bridge] opening /dev/cu.usbmodem1101 @ 9600
+[bridge] http://127.0.0.1:8787/led/{red,yellow,green,off,test}
+[bridge] Ctrl-C to quit</pre>
+  <p>…and the LEDs cycle once on the Arduino. That means the bridge found the board.</p>
+  <p>Leave this terminal window open. Closing it shuts the bridge down and the LEDs stop reacting.</p>
+</section>
+
+<!-- 8. macOS access -->
+<section id="accessibility">
+  <h2><span class="num">08</span>macOS accessibility (one-time)</h2>
+  <p>On macOS, synthetic key presses require permission. The <strong>first</strong> time you push the physical button, macOS will pop up a dialog like:</p>
+  <p><em>"Terminal would like to control this computer using accessibility features."</em></p>
+  <ol>
+    <li>Click <kbd>Open System Settings</kbd>.</li>
+    <li>Go to <strong>Privacy &amp; Security → Accessibility</strong>.</li>
+    <li>Toggle <strong>Terminal</strong> (or iTerm / whichever app runs Claude Code) on.</li>
+    <li>Quit and re-run the bridge so it picks up the new permission.</li>
+  </ol>
+  <div class="callout warn">
+    <strong>If you skip this:</strong> the button still sends <code>BTN</code> over serial and the bridge still logs it, but nothing happens in Claude. That's the usual "the button does nothing" failure mode.
+  </div>
+</section>
+
+<!-- 9. Test -->
+<section id="test">
+  <h2><span class="num">09</span>Test the whole loop</h2>
+  <ol>
+    <li>With the bridge running, open a second terminal and do a quick LED check:
+      <pre>curl http://127.0.0.1:8787/led/test
+curl http://127.0.0.1:8787/led/red
+curl http://127.0.0.1:8787/led/yellow
+curl http://127.0.0.1:8787/led/green
+curl http://127.0.0.1:8787/led/off</pre>
+      Each curl should change the LEDs instantly.
+    </li>
+    <li>Start <code>claude</code> in a terminal and keep that window <em>focused</em>.</li>
+    <li>Type a prompt and hit enter. <strong>Red</strong> should come on immediately.</li>
+    <li>Make Claude want to run a tool that triggers a permission prompt. <strong>Yellow</strong> lights.</li>
+    <li>Push the joystick up/down — the <code>❯</code> selector in Claude should move.</li>
+    <li>Press the big button — the highlighted choice should be accepted (same as pressing Enter).</li>
+    <li>When Claude finishes the turn, <strong>green</strong> comes on.</li>
+  </ol>
+</section>
+
+<!-- 10. Troubleshoot -->
+<section id="troubleshoot">
+  <h2><span class="num">10</span>Troubleshooting</h2>
+
+  <h3>Bridge says "no serial device matching /dev/cu.usbmodem*"</h3>
+  <ul>
+    <li>Plug the Arduino in, then re-run the bridge.</li>
+    <li>Check the exact path with <code>ls /dev/cu.usbmodem*</code> in a terminal.</li>
+    <li>Arduino IDE's Serial Monitor (or another bridge instance) will <em>hog</em> the port. Close it, then start the bridge.</li>
+  </ul>
+
+  <h3>LEDs don't light at all on boot</h3>
+  <ul>
+    <li>The LED is backwards. Flip it — long leg on the Arduino-pin side.</li>
+    <li>The resistor is not in series. It must be between the Arduino pin and the LED's long leg (or between the short leg and GND — either spot works, but <em>one</em> of them is mandatory).</li>
+    <li>The cathode isn't on the GND rail — trace the wire back.</li>
+  </ul>
+
+  <h3>One LED works, another doesn't</h3>
+  <ul>
+    <li>Swap the suspect LED with a known-good one. LEDs fail often on long leads.</li>
+    <li>Compare wiring against the pinout table — D9 / D10 / D11 are the three you need, not D12 / D13.</li>
+  </ul>
+
+  <h3>Button press does nothing in Claude</h3>
+  <ul>
+    <li>Is the terminal running Claude the <strong>frontmost</strong> window? pynput sends keys to whichever app has focus.</li>
+    <li>Accessibility permission — see section 08.</li>
+    <li>Check the bridge terminal: does <code>[bridge] BTN -&gt; Enter</code> print when you press? If yes, it's an accessibility / focus issue, not wiring.</li>
+    <li>Check your button's legs — on a standard 4-pin tactile button, the <em>opposing</em> pair is the one that bridges when pressed, not adjacent legs. Try the other two legs.</li>
+  </ul>
+
+  <h3>Joystick scrolls by itself (drift)</h3>
+  <ul>
+    <li>The module's mechanical center isn't exactly at 512. Edit <code>JOY_CENTER_LO</code> / <code>JOY_CENTER_HI</code> in the <code>.ino</code> and re-upload — widen the window to 380 / 640.</li>
+  </ul>
+
+  <h3>Claude Code feels sluggish after adding hooks</h3>
+  <ul>
+    <li>The LED hook already uses <code>async: true</code> and a 1-second timeout, so a dead bridge can't stall Claude. If it still feels slow, run the bridge; most of the time this makes the perceived difference.</li>
+  </ul>
+
+  <h3>Hooks not firing at all</h3>
+  <ul>
+    <li>In Claude, run the <code>/hooks</code> command to confirm the three events show both an <code>afplay</code> and a <code>curl</code> entry.</li>
+    <li>If you edited <code>~/.claude/settings.json</code> during a session, Claude only reloads hooks when you open <code>/hooks</code> or restart. Open <code>/hooks</code> once to force a reload.</li>
+  </ul>
+</section>
+
+<footer>Claude Controller — hardware setup guide.</footer>
+
+</div>
+</body>
+</html>

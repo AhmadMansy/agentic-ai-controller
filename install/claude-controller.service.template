@@ -1,0 +1,24 @@
+# systemd user unit template for claude-controller bridge (Linux).
+# install.sh substitutes {{PYTHON_BIN}}, {{BRIDGE_SCRIPT}}, {{HTTP_PORT}}.
+# Installed to ~/.config/systemd/user/claude-controller.service
+#
+# Commands:
+#   systemctl --user status  claude-controller
+#   systemctl --user restart claude-controller
+#   journalctl --user -u claude-controller -f
+
+[Unit]
+Description=claude-controller Arduino bridge
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart={{PYTHON_BIN}} {{BRIDGE_SCRIPT}} --http-port {{HTTP_PORT}}
+Restart=on-failure
+RestartSec=5
+# Serial devices need dialout on most distros — the user must already be in it.
+# (Run `sudo usermod -aG dialout $USER` if the bridge cannot open the port.)
+
+[Install]
+WantedBy=default.target
