@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Claude Controller — Hardware Setup</title>
+<title>Agentic AI Controller — Hardware Setup</title>
 <style>
   :root {
     --bg: #0f1115;
@@ -153,10 +153,10 @@
 <div class="wrap">
 
 <header>
-  <h1>Claude Controller
+  <h1>Agentic AI Controller
     <span class="lights"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></span>
   </h1>
-  <p>Physical status lights + approve button for Claude Code. Everything you need to wire, upload, and run.</p>
+  <p>Physical status lights + approve button for AI coding agents. Everything you need to wire, upload, and run.</p>
 </header>
 
 <nav class="toc">
@@ -175,15 +175,15 @@
 <!-- 1. Overview -->
 <section id="overview">
   <h2><span class="num">01</span>What you're building</h2>
-  <p>Three LEDs mirror Claude Code's state. A button and joystick let you approve permission prompts without touching the keyboard.</p>
+  <p>Three LEDs mirror your AI agent's state. A button and joystick let you approve permission prompts without touching the keyboard.</p>
   <div class="grid-2">
     <div class="card">
       <h4><span class="dot r" style="display:inline-block;vertical-align:middle;margin-right:6px"></span>Red — busy</h4>
-      <p>Lights when you submit a prompt. Claude is thinking / running tools.</p>
+      <p>Lights when you submit a prompt. The agent is thinking / running tools.</p>
     </div>
     <div class="card">
       <h4><span class="dot y" style="display:inline-block;vertical-align:middle;margin-right:6px"></span>Yellow — permission</h4>
-      <p>Claude is blocked waiting for you to approve a tool call.</p>
+      <p>The agent is blocked waiting for you to approve a tool call.</p>
     </div>
     <div class="card">
       <h4><span class="dot g" style="display:inline-block;vertical-align:middle;margin-right:6px"></span>Green — ready</h4>
@@ -385,7 +385,7 @@
       <line x1="640" y1="280" x2="300" y2="280" stroke="#8ab4ff" stroke-width="2"/>
 
       <!-- Title / labels at top -->
-      <text x="440" y="60" text-anchor="middle" font-size="14" fill="#8a93a6" font-family="ui-monospace,monospace">claude_controller — wiring</text>
+      <text x="440" y="60" text-anchor="middle" font-size="14" fill="#8a93a6" font-family="ui-monospace,monospace">agentic_ai_controller — wiring</text>
 
     </svg>
     <div class="legend">
@@ -461,7 +461,7 @@
   <ol>
     <li>Plug the Arduino into your Mac with the USB cable.</li>
     <li>Open the Arduino IDE, then <kbd>File</kbd> → <kbd>Open…</kbd> and choose
-      <br><code>~/Desktop/claude controler/arduino/claude_controller/claude_controller.ino</code>
+      <br><code>arduino/agentic_ai_controller/agentic_ai_controller.ino</code>
     </li>
     <li>Set <kbd>Tools</kbd> → <kbd>Board</kbd> → <em>Arduino Uno</em>.</li>
     <li>Set <kbd>Tools</kbd> → <kbd>Port</kbd> → <code>/dev/cu.usbmodem1101</code> (the number may vary; pick the <code>usbmodem</code> one).</li>
@@ -475,10 +475,10 @@
 <!-- 7. Run bridge -->
 <section id="bridge">
   <h2><span class="num">07</span>Install &amp; run the Python bridge</h2>
-  <p>The bridge owns the serial port, serves a tiny HTTP API for Claude's hooks, and turns the physical button/joystick into Enter/↑/↓ keystrokes.</p>
-  <pre>cd "~/Desktop/claude controler/bridge"
+  <p>The bridge owns the serial port, serves a tiny HTTP API for agent hooks, and turns the physical button/joystick into Enter/↑/↓ keystrokes.</p>
+  <pre>cd bridge
 pip3 install -r requirements.txt
-python3 claude_bridge.py</pre>
+python3 agentic_ai_bridge.py</pre>
   <p>On startup you should see:</p>
   <pre>[bridge] opening /dev/cu.usbmodem1101 @ 9600
 [bridge] http://127.0.0.1:8787/led/{red,yellow,green,off,test}
@@ -495,11 +495,11 @@ python3 claude_bridge.py</pre>
   <ol>
     <li>Click <kbd>Open System Settings</kbd>.</li>
     <li>Go to <strong>Privacy &amp; Security → Accessibility</strong>.</li>
-    <li>Toggle <strong>Terminal</strong> (or iTerm / whichever app runs Claude Code) on.</li>
+    <li>Toggle <strong>Terminal</strong> (or iTerm / whichever app runs the agent) on.</li>
     <li>Quit and re-run the bridge so it picks up the new permission.</li>
   </ol>
   <div class="callout warn">
-    <strong>If you skip this:</strong> the button still sends <code>BTN</code> over serial and the bridge still logs it, but nothing happens in Claude. That's the usual "the button does nothing" failure mode.
+    <strong>If you skip this:</strong> the button still sends <code>BTN</code> over serial and the bridge still logs it, but nothing happens. That's the usual "the button does nothing" failure mode.
   </div>
 </section>
 
@@ -515,12 +515,12 @@ curl http://127.0.0.1:8787/led/green
 curl http://127.0.0.1:8787/led/off</pre>
       Each curl should change the LEDs instantly.
     </li>
-    <li>Start <code>claude</code> in a terminal and keep that window <em>focused</em>.</li>
+    <li>Start your AI coding agent in a terminal and keep that window <em>focused</em>.</li>
     <li>Type a prompt and hit enter. <strong>Red</strong> should come on immediately.</li>
-    <li>Make Claude want to run a tool that triggers a permission prompt. <strong>Yellow</strong> lights.</li>
-    <li>Push the joystick up/down — the <code>❯</code> selector in Claude should move.</li>
+    <li>Make the agent want to run a tool that triggers a permission prompt. <strong>Yellow</strong> lights.</li>
+    <li>Push the joystick up/down — the selector should move.</li>
     <li>Press the big button — the highlighted choice should be accepted (same as pressing Enter).</li>
-    <li>When Claude finishes the turn, <strong>green</strong> comes on.</li>
+    <li>When the agent finishes the turn, <strong>green</strong> comes on.</li>
   </ol>
 </section>
 
@@ -548,9 +548,9 @@ curl http://127.0.0.1:8787/led/off</pre>
     <li>Compare wiring against the pinout table — D9 / D10 / D11 are the three you need, not D12 / D13.</li>
   </ul>
 
-  <h3>Button press does nothing in Claude</h3>
+  <h3>Button press does nothing</h3>
   <ul>
-    <li>Is the terminal running Claude the <strong>frontmost</strong> window? pynput sends keys to whichever app has focus.</li>
+    <li>Is the terminal running the agent the <strong>frontmost</strong> window? pynput sends keys to whichever app has focus.</li>
     <li>Accessibility permission — see section 08.</li>
     <li>Check the bridge terminal: does <code>[bridge] BTN -&gt; Enter</code> print when you press? If yes, it's an accessibility / focus issue, not wiring.</li>
     <li>Check your button's legs — on a standard 4-pin tactile button, the <em>opposing</em> pair is the one that bridges when pressed, not adjacent legs. Try the other two legs.</li>
@@ -561,9 +561,9 @@ curl http://127.0.0.1:8787/led/off</pre>
     <li>The module's mechanical center isn't exactly at 512. Edit <code>JOY_CENTER_LO</code> / <code>JOY_CENTER_HI</code> in the <code>.ino</code> and re-upload — widen the window to 380 / 640.</li>
   </ul>
 
-  <h3>Claude Code feels sluggish after adding hooks</h3>
+  <h3>Agent feels sluggish after adding hooks</h3>
   <ul>
-    <li>The LED hook already uses <code>async: true</code> and a 1-second timeout, so a dead bridge can't stall Claude. If it still feels slow, run the bridge; most of the time this makes the perceived difference.</li>
+    <li>The LED hook already uses <code>async: true</code> and a 1-second timeout, so a dead bridge can't stall the agent. If it still feels slow, run the bridge; most of the time this makes the perceived difference.</li>
   </ul>
 
   <h3>Hooks not firing at all</h3>
@@ -573,7 +573,7 @@ curl http://127.0.0.1:8787/led/off</pre>
   </ul>
 </section>
 
-<footer>Claude Controller — hardware setup guide.</footer>
+<footer>Agentic AI Controller — hardware setup guide.</footer>
 
 </div>
 </body>

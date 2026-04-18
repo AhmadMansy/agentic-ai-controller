@@ -25,7 +25,7 @@ bridge/config.json
 Thumbs.db
 
 # Arduino build artefacts (Arduino IDE 2.x places these alongside the .ino)
-arduino/claude_controller/build/
+arduino/agentic_ai_controller/build/
 *.hex
 *.elf
 *.bin

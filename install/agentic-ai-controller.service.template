@@ -1,14 +1,14 @@
-# systemd user unit template for claude-controller bridge (Linux).
+# systemd user unit template for agentic-ai-controller bridge (Linux).
 # install.sh substitutes {{PYTHON_BIN}}, {{BRIDGE_SCRIPT}}, {{HTTP_PORT}}.
-# Installed to ~/.config/systemd/user/claude-controller.service
+# Installed to ~/.config/systemd/user/agentic-ai-controller.service
 #
 # Commands:
-#   systemctl --user status  claude-controller
-#   systemctl --user restart claude-controller
-#   journalctl --user -u claude-controller -f
+#   systemctl --user status  agentic-ai-controller
+#   systemctl --user restart agentic-ai-controller
+#   journalctl --user -u agentic-ai-controller -f
 
 [Unit]
-Description=claude-controller Arduino bridge
+Description=agentic-ai-controller Arduino bridge
 After=graphical-session.target
 PartOf=graphical-session.target
 

@@ -39,7 +39,7 @@ OS="$(uname -s)"
 echo "==> Removing LED hooks from $TARGET_SETTINGS"
 if [ -f "$TARGET_SETTINGS" ]; then
     python3 "$INSTALL_DIR/hooks_merge.py" \
-        --target "$TARGET_SETTINGS --port "$HTTP_PORT" --uninstall
+        --target "$TARGET_SETTINGS" --port "$HTTP_PORT" --uninstall
 else
     echo "    (no settings file — nothing to do)"
 fi

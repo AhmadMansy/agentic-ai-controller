@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- launchd template for claude-controller bridge (macOS).
+<!-- launchd template for agentic-ai-controller bridge (macOS).
      install.sh substitutes {{PYTHON_BIN}}, {{BRIDGE_SCRIPT}}, {{HTTP_PORT}},
      and {{LOG_DIR}} before loading this into launchctl. -->
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
@@ -7,7 +7,7 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.claudecontroller.bridge</string>
+    <string>com.agenticai.controller</string>
 
     <key>ProgramArguments</key>
     <array>

@@ -1,4 +1,4 @@
-// Claude Controller — Arduino Uno firmware
+// Agentic AI Controller — Arduino Uno firmware
 //
 // Wiring (all resistors = 220 ohm for LEDs):
 //   Pin  9 -> Red LED anode     -> 220R -> GND   (BUSY)
