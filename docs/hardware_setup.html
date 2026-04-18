@@ -156,7 +156,7 @@
   <h1>Agentic AI Controller
     <span class="lights"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></span>
   </h1>
-  <p>Physical status lights + approve button for AI coding agents. Everything you need to wire, upload, and run.</p>
+  <p>Physical status lights + approve button for AI coding agents. Works on macOS, Linux, and Windows. Everything you need to wire, upload, and run.</p>
 </header>
 
 <nav class="toc">
@@ -167,7 +167,7 @@
   <a href="#assembly">Assembly</a>
   <a href="#upload">Upload sketch</a>
   <a href="#bridge">Run bridge</a>
-  <a href="#accessibility">macOS access</a>
+  <a href="#accessibility">OS permissions</a>
   <a href="#test">Test it</a>
   <a href="#troubleshoot">Troubleshooting</a>
 </nav>
@@ -211,7 +211,7 @@
       <tr><td>1</td><td>2-axis joystick module</td><td>Typical KY-023 with VCC / GND / VRx / VRy / SW pins.</td></tr>
       <tr><td>1</td><td>Breadboard (half size or larger)</td><td>Solderless.</td></tr>
       <tr><td>~12</td><td>Jumper wires</td><td>Male-to-male for breadboard; male-to-female if the joystick has pin headers.</td></tr>
-      <tr><td>1</td><td>USB cable</td><td>Whatever plugs the Uno into your Mac.</td></tr>
+      <tr><td>1</td><td>USB cable</td><td>Whatever plugs the Uno into your computer.</td></tr>
     </tbody>
   </table>
   <div class="callout">
@@ -459,12 +459,12 @@
 <section id="upload">
   <h2><span class="num">06</span>Upload the sketch</h2>
   <ol>
-    <li>Plug the Arduino into your Mac with the USB cable.</li>
+    <li>Plug the Arduino into your computer with the USB cable.</li>
     <li>Open the Arduino IDE, then <kbd>File</kbd> → <kbd>Open…</kbd> and choose
       <br><code>arduino/agentic_ai_controller/agentic_ai_controller.ino</code>
     </li>
     <li>Set <kbd>Tools</kbd> → <kbd>Board</kbd> → <em>Arduino Uno</em>.</li>
-    <li>Set <kbd>Tools</kbd> → <kbd>Port</kbd> → <code>/dev/cu.usbmodem1101</code> (the number may vary; pick the <code>usbmodem</code> one).</li>
+    <li>Set <kbd>Tools</kbd> → <kbd>Port</kbd> → <code>/dev/cu.usbmodem*</code> (macOS), <code>/dev/ttyACM*</code> (Linux), or <code>COM*</code> (Windows). The exact number may vary.</li>
     <li>Click the <strong>Upload</strong> arrow (→) in the toolbar. Wait for <em>"Done uploading"</em> at the bottom.</li>
   </ol>
   <div class="callout ok">
@@ -487,10 +487,10 @@ python3 agentic_ai_bridge.py</pre>
   <p>Leave this terminal window open. Closing it shuts the bridge down and the LEDs stop reacting.</p>
 </section>
 
-<!-- 8. macOS access -->
+<!-- 8. OS permissions -->
 <section id="accessibility">
-  <h2><span class="num">08</span>macOS accessibility (one-time)</h2>
-  <p>On macOS, synthetic key presses require permission. The <strong>first</strong> time you push the physical button, macOS will pop up a dialog like:</p>
+  <h2><span class="num">08</span>OS permissions (one-time)</h2>
+  <p>On <strong>macOS</strong>, synthetic key presses require Accessibility permission. The <strong>first</strong> time you push the physical button, macOS will pop up a dialog like:</p>
   <p><em>"Terminal would like to control this computer using accessibility features."</em></p>
   <ol>
     <li>Click <kbd>Open System Settings</kbd>.</li>
@@ -499,8 +499,9 @@ python3 agentic_ai_bridge.py</pre>
     <li>Quit and re-run the bridge so it picks up the new permission.</li>
   </ol>
   <div class="callout warn">
-    <strong>If you skip this:</strong> the button still sends <code>BTN</code> over serial and the bridge still logs it, but nothing happens. That's the usual "the button does nothing" failure mode.
+    <strong>If you skip this (macOS):</strong> the button still sends <code>BTN</code> over serial and the bridge still logs it, but nothing happens. That's the usual "the button does nothing" failure mode.
   </div>
+  <p><strong>Linux &amp; Windows:</strong> no extra permission step is needed. The bridge injects keystrokes directly via <code>pynput</code>. On some Linux distros you may need to add yourself to the <code>dialout</code> or <code>uucp</code> group for serial port access (see the README).</p>
 </section>
 
 <!-- 9. Test -->
@@ -528,10 +529,10 @@ curl http://127.0.0.1:8787/led/off</pre>
 <section id="troubleshoot">
   <h2><span class="num">10</span>Troubleshooting</h2>
 
-  <h3>Bridge says "no serial device matching /dev/cu.usbmodem*"</h3>
+  <h3>Bridge says "no serial device matching …"</h3>
   <ul>
     <li>Plug the Arduino in, then re-run the bridge.</li>
-    <li>Check the exact path with <code>ls /dev/cu.usbmodem*</code> in a terminal.</li>
+    <li>Check the exact path with <code>ls /dev/cu.usbmodem*</code> (macOS), <code>ls /dev/ttyACM*</code> (Linux), or check Device Manager (Windows).</li>
     <li>Arduino IDE's Serial Monitor (or another bridge instance) will <em>hog</em> the port. Close it, then start the bridge.</li>
   </ul>
 
@@ -551,7 +552,7 @@ curl http://127.0.0.1:8787/led/off</pre>
   <h3>Button press does nothing</h3>
   <ul>
     <li>Is the terminal running the agent the <strong>frontmost</strong> window? pynput sends keys to whichever app has focus.</li>
-    <li>Accessibility permission — see section 08.</li>
+    <li>OS permissions — see section 08 (macOS Accessibility, Linux/Windows group membership).</li>
     <li>Check the bridge terminal: does <code>[bridge] BTN -&gt; Enter</code> print when you press? If yes, it's an accessibility / focus issue, not wiring.</li>
     <li>Check your button's legs — on a standard 4-pin tactile button, the <em>opposing</em> pair is the one that bridges when pressed, not adjacent legs. Try the other two legs.</li>
   </ul>

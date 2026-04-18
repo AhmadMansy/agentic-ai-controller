@@ -4,8 +4,8 @@
 # Does three things, safely and idempotently:
 #   1. Installs Python dependencies from bridge/requirements.txt
 #   2. Merges LED hooks into ~/.claude/settings.json (backs up first)
-#   3. Optionally installs a launchd (macOS) or systemd-user (Linux) service
-#      so the bridge auto-starts at login.
+#   3. Optionally installs a launchd (macOS), systemd-user (Linux), or
+#      startup shortcut (Windows) service so the bridge auto-starts at login.
 #
 # Usage:
 #     ./install.sh                  # interactive
@@ -158,6 +158,7 @@ Next steps:
   ${BOLD}3.${RESET} ${YELLOW}macOS only:${RESET} when you press the button the first time, macOS will
      prompt for Accessibility access. Grant it to the terminal (or launchd
      process) running the bridge, then restart the bridge.
+     ${DIM}(Linux and Windows do not require this step.)${RESET}
 
   ${BOLD}4.${RESET} In Claude Code, run  /hooks  once to force a settings reload, or
      simply restart claude.

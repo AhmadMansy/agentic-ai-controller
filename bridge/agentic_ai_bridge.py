@@ -25,6 +25,7 @@ Serial protocol (see arduino/agentic_ai_controller/agentic_ai_controller.ino):
     Host -> Arduino:  R | Y | G | O | T
     Arduino -> Host:  BTN\\n | UP\\n | DN\\n
 
+Supported on macOS, Linux, and Windows.
 macOS: first synthetic keystroke triggers an Accessibility prompt.
 Grant access to the *terminal* running this bridge, then restart it.
 """
@@ -48,14 +49,14 @@ from typing import Optional
 try:
     import serial
     from serial.tools import list_ports
-except ImportError  # pragma: no cover
+except ImportError:  # pragma: no cover
     print("error: pyserial is not installed. Run: pip install -r requirements.txt",
           file=sys.stderr)
     sys.exit(2)
 
 try:
     from pynput.keyboard import Controller, Key
-except ImportError  # pragma: no cover
+except ImportError:  # pragma: no cover
     print("error: pynput is not installed. Run: pip install -r requirements.txt",
           file=sys.stderr)
     sys.exit(2)

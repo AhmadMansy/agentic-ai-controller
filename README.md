@@ -1,6 +1,6 @@
 # agentic-ai-controller
 
-Physical status lights + approve button for [Claude Code](https://claude.com/claude-code).
+Physical status lights + approve button for [Claude Code](https://claude.com/claude-code). Works on **macOS**, **Linux**, and **Windows**.
 
 Turn an Arduino Uno, three LEDs, a button and a joystick into a dedicated console for AI agents: glance at your desk to know whether your agent is working, waiting on you, or done — and approve permission prompts without leaving whatever you're doing.
 
@@ -117,6 +117,8 @@ In an open Claude Code session, run `/hooks` once — or restart `claude` — so
 
 When you press the button for the first time, macOS will prompt for Accessibility access. Toggle on the terminal (or `launchd`) process running the bridge, then restart it.
 
+> **Note:** This step is macOS-specific. Linux and Windows do not require this.
+
 ## Usage
 
 Once installed, the bridge auto-starts at login. Just use Claude Code as normal — the LEDs reflect state, and the button/joystick act on permission prompts.
@@ -208,7 +210,7 @@ This removes **only** the hooks it owns (identified by the `127.0.0.1:PORT/led/`
 | LEDs don't light at all on boot | LED wired backwards or no resistor | Long leg → Arduino pin (via resistor); short leg → GND. |
 | `no serial device matching ...` | Arduino not plugged in, or Serial Monitor is hogging the port | Close Arduino IDE's Serial Monitor, re-run the bridge. |
 | Bridge runs but LEDs don't react to Claude | Hooks not reloaded, or wrong port | Run `/hooks` in Claude once, and confirm `curl http://127.0.0.1:8787/led/red` flips the LED. |
-| Bridge logs `BTN -> ok` but Claude doesn't accept | macOS Accessibility, or focus | Grant Accessibility to the terminal running the bridge; click into the Claude window before pressing. |
+| Bridge logs `BTN -> ok` but Claude doesn't accept | Accessibility (macOS), focus, or permissions | macOS: grant Accessibility. Linux/Windows: check focus; click into the Claude window before pressing. |
 | Yellow stays on after approving | Old config — fixed in v1.0.0 | Re-run `./install/install.sh`; it re-merges the `PostToolUse` hook that clears yellow → red. |
 | Joystick drifts | Module center isn't exactly 512 | Edit `JOY_CENTER_LO` / `JOY_CENTER_HI` in `arduino/agentic_ai_controller/agentic_ai_controller.ino`, widen to 380/640, re-upload. |
 
