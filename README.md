@@ -1,8 +1,8 @@
-# claude-controller
+# agentic-ai-controller
 
 Physical status lights + approve button for [Claude Code](https://claude.com/claude-code).
 
-Turn an Arduino Uno, three LEDs, a button and a joystick into a dedicated console for Claude: glance at your desk to know whether Claude is working, waiting on you, or done — and approve permission prompts without leaving whatever you're doing.
+Turn an Arduino Uno, three LEDs, a button and a joystick into a dedicated console for AI agents: glance at your desk to know whether your agent is working, waiting on you, or done — and approve permission prompts without leaving whatever you're doing.
 
 <p align="center">
   <img src="docs/images/demo.svg" alt="Three LEDs labelled BUSY, PERMISSION, READY with a joystick and a big red button" width="640">
@@ -12,8 +12,8 @@ Turn an Arduino Uno, three LEDs, a button and a joystick into a dedicated consol
 
 | LED | Meaning | Fired by hook |
 |---|---|---|
-| 🔴 **Red** | Busy — Claude is thinking or running a tool | `UserPromptSubmit`, `PreToolUse`, `PostToolUse` |
-| 🟡 **Yellow** | Permission — Claude is waiting for your approval | `PermissionRequest` |
+| 🔴 **Red** | Busy — agent is thinking or running a tool | `UserPromptSubmit`, `PreToolUse`, `PostToolUse` |
+| 🟡 **Yellow** | Permission — agent is waiting for your approval | `PermissionRequest` |
 | 🟢 **Green** | Ready — turn is finished | `Stop` |
 
 And physical input:
@@ -29,7 +29,7 @@ And physical input:
 
 ```
 ┌──────────────┐  USB-serial   ┌───────────────┐  HTTP hooks  ┌──────────────┐
-│  Arduino Uno │◀─────────────▶│ Python bridge │◀─────────────│ Claude Code  │
+│  Arduino Uno │◀─────────────▶│ Python bridge │◀─────────────│  Claude Code │
 │  LEDs + btn  │   9600 baud   │  (this repo)  │  127.0.0.1   │              │
 └──────────────┘               └───────────────┘              └──────────────┘
                                        │
@@ -85,8 +85,8 @@ And physical input:
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/claude-controller.git
-cd claude-controller
+git clone https://github.com/YOUR-USERNAME/agentic-ai-controller.git
+cd agentic-ai-controller
 ```
 
 ### 2. Wire the hardware
@@ -95,7 +95,7 @@ Follow [`docs/hardware_setup.html`](docs/hardware_setup.html). It takes about 10
 
 ### 3. Upload the sketch
 
-Open `arduino/claude_controller/claude_controller.ino` in the Arduino IDE, pick **Arduino Uno** as the board, and click **Upload**. On power-up you should see all three LEDs cycle once, then green stays on.
+Open `arduino/agentic_ai_controller/agentic_ai_controller.ino` in the Arduino IDE, pick **Arduino Uno** as the board, and click **Upload**. On power-up you should see all three LEDs cycle once, then green stays on.
 
 ### 4. Run the installer
 
@@ -125,32 +125,32 @@ Once installed, the bridge auto-starts at login. Just use Claude Code as normal 
 
 ```bash
 # Start in foreground with debug logs
-python3 bridge/claude_bridge.py --log-level DEBUG
+python3 bridge/agentic_ai_bridge.py --log-level DEBUG
 
 # Use a specific serial port and HTTP port
-python3 bridge/claude_bridge.py --port /dev/cu.usbmodem1101 --http-port 9000
+python3 bridge/agentic_ai_bridge.py --port /dev/cu.usbmodem1101 --http-port 9000
 
 # List detected serial ports and exit
-python3 bridge/claude_bridge.py --list-ports
+python3 bridge/agentic_ai_bridge.py --list-ports
 
 # See all flags
-python3 bridge/claude_bridge.py --help
+python3 bridge/agentic_ai_bridge.py --help
 ```
 
 ### Managing the background service
 
 **macOS (launchd)**
 ```bash
-launchctl unload ~/Library/LaunchAgents/com.claudecontroller.bridge.plist
-launchctl load   ~/Library/LaunchAgents/com.claudecontroller.bridge.plist
-tail -f ~/Library/Logs/claude-controller/bridge.err.log
+launchctl unload ~/Library/LaunchAgents/com.agenticai.controller.plist
+launchctl load   ~/Library/LaunchAgents/com.agenticai.controller.plist
+tail -f ~/Library/Logs/agentic-ai-controller/bridge.err.log
 ```
 
 **Linux (systemd user)**
 ```bash
-systemctl --user restart claude-controller
-systemctl --user status  claude-controller
-journalctl  --user -u claude-controller -f
+systemctl --user restart agentic-ai-controller
+systemctl --user status  agentic-ai-controller
+journalctl  --user -u agentic-ai-controller -f
 ```
 
 ### Sanity-check the HTTP API
@@ -171,7 +171,7 @@ The bridge reads an optional JSON config file passed via `--config`:
 ```bash
 cp bridge/config.example.json bridge/config.json
 # edit bridge/config.json
-python3 bridge/claude_bridge.py --config bridge/config.json
+python3 bridge/agentic_ai_bridge.py --config bridge/config.json
 ```
 
 Keys (all optional; missing keys fall back to defaults):
@@ -210,7 +210,7 @@ This removes **only** the hooks it owns (identified by the `127.0.0.1:PORT/led/`
 | Bridge runs but LEDs don't react to Claude | Hooks not reloaded, or wrong port | Run `/hooks` in Claude once, and confirm `curl http://127.0.0.1:8787/led/red` flips the LED. |
 | Bridge logs `BTN -> ok` but Claude doesn't accept | macOS Accessibility, or focus | Grant Accessibility to the terminal running the bridge; click into the Claude window before pressing. |
 | Yellow stays on after approving | Old config — fixed in v1.0.0 | Re-run `./install/install.sh`; it re-merges the `PostToolUse` hook that clears yellow → red. |
-| Joystick drifts | Module center isn't exactly 512 | Edit `JOY_CENTER_LO` / `JOY_CENTER_HI` in `arduino/claude_controller/claude_controller.ino`, widen to 380/640, re-upload. |
+| Joystick drifts | Module center isn't exactly 512 | Edit `JOY_CENTER_LO` / `JOY_CENTER_HI` in `arduino/agentic_ai_controller/agentic_ai_controller.ino`, widen to 380/640, re-upload. |
 
 Full troubleshooting section is in [`docs/hardware_setup.html`](docs/hardware_setup.html) §10.
 
@@ -227,19 +227,19 @@ Full troubleshooting section is in [`docs/hardware_setup.html`](docs/hardware_se
 ## Project layout
 
 ```
-claude-controller/
-├── arduino/claude_controller/
-│   └── claude_controller.ino        # the firmware
+agentic-ai-controller/
+├── arduino/agentic_ai_controller/
+│   └── agentic_ai_controller.ino      # the firmware
 ├── bridge/
-│   ├── claude_bridge.py             # the daemon
+│   ├── agentic_ai_bridge.py           # the daemon
 │   ├── config.example.json
 │   └── requirements.txt
 ├── install/
-│   ├── install.sh                   # installer
+│   ├── install.sh                     # installer
 │   ├── uninstall.sh
-│   ├── hooks_merge.py               # safe settings.json merger
-│   ├── com.claudecontroller.bridge.plist.template
-│   └── claude-controller.service.template
+│   ├── hooks_merge.py                 # safe settings.json merger
+│   ├── com.agenticai.controller.plist.template
+│   └── agentic-ai-controller.service.template
 ├── docs/
 │   └── hardware_setup.html
 ├── README.md

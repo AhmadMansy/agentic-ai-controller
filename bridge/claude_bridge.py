@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-claude-bridge — physical controller for Claude Code.
+agentic-ai-bridge — physical controller for AI coding agents.
 
 Owns the Arduino serial port and exposes a loopback HTTP API so Claude Code
 hooks can set the LED state with a single curl. In the reverse direction,
@@ -8,20 +8,20 @@ button and joystick events from the Arduino are turned into keystrokes
 (Enter / ↑ / ↓) and injected into the frontmost window.
 
 Run:
-    python3 claude_bridge.py                 # auto-detect everything
-    python3 claude_bridge.py --port /dev/cu.usbmodem1101
-    python3 claude_bridge.py --config ./config.json
-    python3 claude_bridge.py --help
+    python3 agentic_ai_bridge.py                 # auto-detect everything
+    python3 agentic_ai_bridge.py --port /dev/cu.usbmodem1101
+    python3 agentic_ai_bridge.py --config ./config.json
+    python3 agentic_ai_bridge.py --help
 
 HTTP (loopback only):
-    GET /led/red      red on   (Claude is busy)
-    GET /led/yellow   yellow on (Claude wants permission)
-    GET /led/green    green on (Claude is idle/ready)
+    GET /led/red      red on   (agent is busy)
+    GET /led/yellow   yellow on (agent wants permission)
+    GET /led/green    green on (agent is idle/ready)
     GET /led/off      all off
     GET /led/test     cycle all 3 LEDs once
     GET /healthz      bridge liveness check
 
-Serial protocol (see arduino/claude_controller/claude_controller.ino):
+Serial protocol (see arduino/agentic_ai_controller/agentic_ai_controller.ino):
     Host -> Arduino:  R | Y | G | O | T
     Arduino -> Host:  BTN\\n | UP\\n | DN\\n
 
@@ -48,21 +48,21 @@ from typing import Optional
 try:
     import serial
     from serial.tools import list_ports
-except ImportError:  # pragma: no cover
+except ImportError  # pragma: no cover
     print("error: pyserial is not installed. Run: pip install -r requirements.txt",
           file=sys.stderr)
     sys.exit(2)
 
 try:
     from pynput.keyboard import Controller, Key
-except ImportError:  # pragma: no cover
+except ImportError  # pragma: no cover
     print("error: pynput is not installed. Run: pip install -r requirements.txt",
           file=sys.stderr)
     sys.exit(2)
 
 __version__ = "1.0.0"
 
-log = logging.getLogger("claude-bridge")
+log = logging.getLogger("agentic-ai-bridge")
 
 DEFAULT_CONFIG = {
     "port": None,               # None → auto-detect
@@ -365,8 +365,8 @@ def load_config(path: Optional[Path]) -> dict:
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        prog="claude-bridge",
-        description="Physical controller bridge for Claude Code.",
+        prog="agentic-ai-bridge",
+        description="Physical controller bridge for AI coding agents.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     p.add_argument("--version", action="version", version=f"%(prog)s {__version__}")

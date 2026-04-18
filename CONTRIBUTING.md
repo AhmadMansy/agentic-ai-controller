@@ -1,4 +1,4 @@
-# Contributing to claude-controller
+# Contributing to agentic-ai-controller
 
 Thanks for wanting to help. This is a small, hardware-adjacent project — contributions are welcome in all of these areas:
 
@@ -18,14 +18,14 @@ Thanks for wanting to help. This is a small, hardware-adjacent project — contr
 ## Dev setup
 
 ```bash
-git clone https://github.com/YOUR-FORK/claude-controller
-cd claude-controller
+git clone https://github.com/YOUR-FORK/agentic-ai-controller
+cd agentic-ai-controller
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r bridge/requirements.txt
 
 # Run the bridge without installing hooks
-python3 bridge/claude_bridge.py --log-level DEBUG
+python3 bridge/agentic_ai_bridge.py --log-level DEBUG
 ```
 
 Dry-run the hook merger against a throwaway file to test changes:
@@ -47,7 +47,7 @@ python3 install/hooks_merge.py --target /tmp/settings.json --dry-run
 Please include:
 
 - OS + version, Python version, Arduino board model
-- Output of `python3 bridge/claude_bridge.py --log-level DEBUG --list-ports`
+- Output of `python3 bridge/agentic_ai_bridge.py --log-level DEBUG --list-ports`
 - Contents of `~/.claude/settings.json` with any secrets redacted
 - Whether the LEDs light on boot (confirms the Arduino sketch is running)
 - Whether `curl http://127.0.0.1:8787/led/test` cycles the LEDs (confirms HTTP path)

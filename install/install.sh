@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# claude-controller installer
+# agentic-ai-controller installer
 #
 # Does three things, safely and idempotently:
 #   1. Installs Python dependencies from bridge/requirements.txt
@@ -39,7 +39,7 @@ die()  { printf "%sxx%s %s\n"  "$RED"    "$RESET" "$*" >&2; exit 1; }
 
 usage() {
     cat <<EOF
-${BOLD}claude-controller installer${RESET}
+${BOLD}agentic-ai-controller installer${RESET}
 
 Usage: $(basename "$0") [options]
 
@@ -53,8 +53,8 @@ Options:
 
 Files touched:
   * $TARGET_SETTINGS  (hooks merged in; backed up before write)
-  * ~/Library/LaunchAgents/com.claudecontroller.bridge.plist   (macOS, if --service)
-  * ~/.config/systemd/user/claude-controller.service           (Linux,  if --service)
+  * ~/Library/LaunchAgents/com.agenticai.controller.plist      (macOS, if --service)
+  * ~/.config/systemd/user/agentic-ai-controller.service       (Linux,  if --service)
 EOF
 }
 
@@ -105,26 +105,26 @@ fi
 
 if [ "$INSTALL_SERVICE" = "yes" ]; then
     PYTHON_BIN="$(command -v python3)"
-    BRIDGE_SCRIPT="$BRIDGE_DIR/claude_bridge.py"
+    BRIDGE_SCRIPT="$BRIDGE_DIR/agentic_ai_bridge.py"
 
     if [ "$PLATFORM" = "macos" ]; then
-        PLIST_SRC="$INSTALL_DIR/com.claudecontroller.bridge.plist.template"
-        PLIST_DST="$HOME/Library/LaunchAgents/com.claudecontroller.bridge.plist"
+        PLIST_SRC="$INSTALL_DIR/com.agenticai.controller.plist.template"
+        PLIST_DST="$HOME/Library/LaunchAgents/com.agenticai.controller.plist"
         mkdir -p "$(dirname "$PLIST_DST")"
         sed \
             -e "s|{{PYTHON_BIN}}|$PYTHON_BIN|g" \
             -e "s|{{BRIDGE_SCRIPT}}|$BRIDGE_SCRIPT|g" \
             -e "s|{{HTTP_PORT}}|$HTTP_PORT|g" \
-            -e "s|{{LOG_DIR}}|$HOME/Library/Logs/claude-controller|g" \
+            -e "s|{{LOG_DIR}}|$HOME/Library/Logs/agentic-ai-controller|g" \
             "$PLIST_SRC" > "$PLIST_DST"
-        mkdir -p "$HOME/Library/Logs/claude-controller"
+        mkdir -p "$HOME/Library/Logs/agentic-ai-controller"
         launchctl unload "$PLIST_DST" 2>/dev/null || true
         launchctl load -w "$PLIST_DST"
         say "launchd service installed at $PLIST_DST"
-        say "logs: ~/Library/Logs/claude-controller/"
+        say "logs: ~/Library/Logs/agentic-ai-controller/"
     elif [ "$PLATFORM" = "linux" ]; then
-        UNIT_SRC="$INSTALL_DIR/claude-controller.service.template"
-        UNIT_DST="$HOME/.config/systemd/user/claude-controller.service"
+        UNIT_SRC="$INSTALL_DIR/agentic-ai-controller.service.template"
+        UNIT_DST="$HOME/.config/systemd/user/agentic-ai-controller.service"
         mkdir -p "$(dirname "$UNIT_DST")"
         sed \
             -e "s|{{PYTHON_BIN}}|$PYTHON_BIN|g" \
@@ -132,9 +132,9 @@ if [ "$INSTALL_SERVICE" = "yes" ]; then
             -e "s|{{HTTP_PORT}}|$HTTP_PORT|g" \
             "$UNIT_SRC" > "$UNIT_DST"
         systemctl --user daemon-reload
-        systemctl --user enable --now claude-controller.service
-        say "systemd user service installed: claude-controller.service"
-        say "check with: systemctl --user status claude-controller"
+        systemctl --user enable --now agentic-ai-controller.service
+        say "systemd user service installed: agentic-ai-controller.service"
+        say "check with: systemctl --user status agentic-ai-controller"
     else
         warn "unknown platform $OS — skipping service install"
     fi
@@ -148,12 +148,12 @@ ${GREEN}${BOLD}Done.${RESET}
 Next steps:
   ${BOLD}1.${RESET} Upload the sketch to the Arduino Uno:
         Open Arduino IDE, File -> Open ->
-          $REPO_DIR/arduino/claude_controller/claude_controller.ino
+          $REPO_DIR/arduino/agentic_ai_controller/agentic_ai_controller.ino
         Tools -> Board: Arduino Uno
         Tools -> Port:  pick the /dev/cu.usbmodem* (macOS), /dev/ttyACM* (Linux), or COM* (Windows)
         Click Upload. The three LEDs flash once and the green one stays on.
 
-  ${BOLD}2.${RESET} $([ "$INSTALL_SERVICE" = "yes" ] && echo "The bridge is already running in the background." || echo "Start the bridge manually:   python3 $BRIDGE_DIR/claude_bridge.py")
+  ${BOLD}2.${RESET} $([ "$INSTALL_SERVICE" = "yes" ] && echo "The bridge is already running in the background." || echo "Start the bridge manually:   python3 $BRIDGE_DIR/agentic_ai_bridge.py")
 
   ${BOLD}3.${RESET} ${YELLOW}macOS only:${RESET} when you press the button the first time, macOS will
      prompt for Accessibility access. Grant it to the terminal (or launchd

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Idempotent installer for claude-controller LED hooks.
+Idempotent installer for agentic-ai-controller LED hooks.
 
 Adds five hook entries to ~/.claude/settings.json (or --target) that each
 ping the bridge's HTTP API. Preserves every hook the user already has; on

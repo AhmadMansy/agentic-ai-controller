@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# claude-controller uninstaller — reverses install.sh without touching
+# agentic-ai-controller uninstaller — reverses install.sh without touching
 # any other hook or setting.
 
 set -euo pipefail
@@ -13,7 +13,7 @@ TARGET_SETTINGS="${CLAUDE_SETTINGS:-$HOME/.claude/settings.json}"
 
 usage() {
     cat <<EOF
-claude-controller uninstaller
+agentic-ai-controller uninstaller
 
 Usage: $(basename "$0") [options]
 
@@ -39,23 +39,23 @@ OS="$(uname -s)"
 echo "==> Removing LED hooks from $TARGET_SETTINGS"
 if [ -f "$TARGET_SETTINGS" ]; then
     python3 "$INSTALL_DIR/hooks_merge.py" \
-        --target "$TARGET_SETTINGS" --port "$HTTP_PORT" --uninstall
+        --target "$TARGET_SETTINGS --port "$HTTP_PORT" --uninstall
 else
     echo "    (no settings file — nothing to do)"
 fi
 
 if [ "$OS" = "Darwin" ]; then
-    PLIST="$HOME/Library/LaunchAgents/com.claudecontroller.bridge.plist"
+    PLIST="$HOME/Library/LaunchAgents/com.agenticai.controller.plist"
     if [ -f "$PLIST" ]; then
         echo "==> Unloading launchd service"
         launchctl unload "$PLIST" 2>/dev/null || true
         rm -f "$PLIST"
     fi
 elif [ "$OS" = "Linux" ]; then
-    UNIT="$HOME/.config/systemd/user/claude-controller.service"
+    UNIT="$HOME/.config/systemd/user/agentic-ai-controller.service"
     if [ -f "$UNIT" ]; then
         echo "==> Stopping systemd user service"
-        systemctl --user disable --now claude-controller.service 2>/dev/null || true
+        systemctl --user disable --now agentic-ai-controller.service 2>/dev/null || true
         rm -f "$UNIT"
         systemctl --user daemon-reload
     fi
